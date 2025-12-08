@@ -1,0 +1,14 @@
+# === Core scientific stack ===
+numpy==1.26.4
+pandas==2.2.2
+
+# === LLM & RAG ===
+openai
+langchain
+
+# === Utility libraries ===
+python-dotenv==1.0.1
+tqdm==4.66.1
+
+# === Optional for plotting (recommended) ===
+matplotlib==3.8.3
