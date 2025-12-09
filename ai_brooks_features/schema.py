@@ -13,6 +13,7 @@ class MetaContext:
     day_index: int                # 当天第几根 bar（从 0 开始）
     session: str                  # "RTH" / "ETH" / "UNKNOWN"
     day_of_week: int              # 0=Monday ... 6=Sunday
+    bar_index: int                # 🔥 在整个 df 里的行号索引（0..len(df)-1）
 
 
 @dataclass
