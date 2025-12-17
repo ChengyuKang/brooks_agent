@@ -1,0 +1,121 @@
+{
+  "snapshot": {
+    "meta": {
+      "timestamp": "2025-12-17 14:15:00-05:00",
+      "symbol": "SPY",
+      "day_index": 57,
+      "session": "RTH",
+      "day_of_week": 2,
+      "bar_index": 4621
+    },
+    "bar": {
+      "body_rel": 0.14998474214220323,
+      "upper_tail_rel": 0.7499237107110162,
+      "lower_tail_rel": 0.10009154714678059,
+      "close_pos_rel": 0.25007628928898384,
+      "range_rel_atr": 0.6031436354266363,
+      "gap_to_prev_close": -0.015092394905396453,
+      "is_trend_bar_score": 0.28717468067483326,
+      "is_doji_score": 0.6250381446444919,
+      "is_outside_score": 0.0,
+      "is_inside_score": 0.0,
+      "volume_zscore": 0.08501667953386369
+    },
+    "local_trend": {
+      "ema_slope": -0.1099051201514672,
+      "bars_above_ema_ratio": 0.05,
+      "consecutive_bull_bars": 3,
+      "consecutive_bear_bars": 0,
+      "micro_channel_bars": 1,
+      "pullback_depth_rel": 0.3300707217435585,
+      "pullback_bars": 5,
+      "spike_strength": 0.3797153604544016,
+      "trend_persistence": 0.1898576802272008
+    },
+    "swing": {
+      "swing_direction": -1.0,
+      "hh_ll_score": 0.0,
+      "swing_leg1_size": 1.6736913789295444,
+      "swing_leg2_size": 2.5427924611646913,
+      "leg2_vs_leg1_ratio": 1.5192720074778687,
+      "wedge_push_count": 2,
+      "wedge_score": 0.5,
+      "double_top_score": 0.0,
+      "double_bottom_score": 0.0
+    },
+    "trading_range": {
+      "overlap_ratio": 1.0,
+      "range_height_rel_atr": 4.2542148273577265,
+      "time_in_range_bars": 0,
+      "tests_of_range_high": 2,
+      "tests_of_range_low": 3,
+      "breakout_attempts": 0,
+      "breakout_fail_ratio": 0.0,
+      "barbwire_score": 0.0
+    },
+    "reversals": {
+      "trendline_break_score": 0.0,
+      "channel_overshoot_score": 0.0,
+      "climax_runup_score": 0.04000000000000001,
+      "pullback_after_climax_bars": 0,
+      "higher_low_score": 0.0,
+      "lower_high_score": 0.0,
+      "high1_score": 0.0,
+      "high2_score": 0.0,
+      "low1_score": 0.0,
+      "low2_score": 0.7,
+      "final_flag_score": 0.0
+    },
+    "risk_reward": {
+      "nearest_support_dist": 0.9725392034160348,
+      "nearest_resistance_dist": 10.056780534491644,
+      "stop_distance_suggested": 1.0,
+      "scalp_target_dist": 1.0,
+      "swing_target_dist": 2.0,
+      "rr_swing_estimate": 2.0,
+      "rr_scalp_estimate": 1.0,
+      "prob_trend_continuation": 0.0,
+      "prob_reversal": 0.0,
+      "prob_range_continuation": 0.0
+    },
+    "regime": {
+      "trending_score": 0.26481024030293443,
+      "ranging_score": 0.6994380230189698,
+      "reversal_setup_score": 0.0,
+      "breakout_mode_score": 0.0
+    },
+    "timeframe_minutes": 5,
+    "time_of_day_fraction": 0.59375
+  },
+  "account": {
+    "equity": 1000.0,
+    "max_risk_per_trade_r": 1.0,
+    "max_daily_loss_r": 3.0,
+    "realized_pnl_r_today": 0.0
+  },
+  "position": {
+    "has_open_position": false,
+    "side": null,
+    "entry_price": null,
+    "stop_price": null,
+    "target_price_1": null,
+    "target_price_2": null,
+    "size_contracts": null,
+    "time_in_bars": 0,
+    "unrealized_r": null
+  },
+  "price_ctx": {
+    "current_price": 672.7000122070312,
+    "current_atr": 0.663232421875,
+    "day_open": 679.8900146484375,
+    "day_high": 680.4349975585938,
+    "day_low": 672.0549926757812,
+    "recent_swing_high": 679.3699951171875,
+    "recent_swing_low": 672.0549926757812
+  },
+  "trades_summary": {
+    "trades_today": 0,
+    "last_trade_outcome_r": null
+  }
+}
+

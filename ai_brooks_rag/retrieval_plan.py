@@ -21,3 +21,7 @@ class RetrievalPlan:
 
     # 你可以留着以后做更细粒度过滤（v0.1 可不用）
     filters: Optional[Dict] = None
+    
+    queries: Optional[List[str]] = None
+    token_budget: int = 6000              # 给“动态 chunks”的预算（不含 snapshot/xinfa）
+    expand_from_top_m: int = 10           # 只对 top_m 做 neighbor 扩展，避免爆炸
