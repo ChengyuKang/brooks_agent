@@ -20,7 +20,7 @@ def main():
     for i, d in enumerate(docs, 1):
         m = d.metadata
         print("\n" + "="*80)
-        print(f"[{i}] {m.get('book')} | {m.get('chapter')} | pages {m.get('page_start')}-{m.get('page_end')}")
+        print(f"[{i}] {m.get('book')} | {m.get('chapter')} | seq {m.get('seq')}| pages {m.get('page_start')}-{m.get('page_end')}")
         print(d.page_content[:500])
 
 if __name__ == "__main__":
