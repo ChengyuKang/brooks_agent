@@ -1,255 +1,276 @@
-# brooks_agent
+# AI Brooks RAG Trading Agent (Research / Portfolio Project)
 
-AI Brooks RAG Trading Agent (Research / Portfolio Project)
+**Status:** Research prototype / portfolio project  
+**Goal:** Explore how to combine feature engineering + RAG + LLM reasoning to produce a structured, explainable trading plan inspired by Al Brooks' price-action framework.
 
-Status: Research prototype / portfolio project
-Goal: Explore how to combine feature engineering + RAG + LLM reasoning to produce a structured, explainable trading plan inspired by Al Brooks’ price-action framework.
-Note: This project is not a proven profitable system and is expected to fail as a fully automated trading strategy in real markets. The point is the engineering + research process, not guaranteed returns.
+> This project is **not** a proven profitable system and is expected to fail as a fully automated strategy in real markets.  
+> The focus is engineering and research process, not guaranteed returns.
 
-What this project is
+## What This Project Is
 
-This repo builds a modular “AI trading assistant” prototype for intraday trading (initially 5-minute bars on SPY/ES style instruments). It:
+This repository builds a modular AI trading assistant prototype for intraday workflows (currently focused on 5-minute bars for SPY/ES-style instruments). It:
 
-Converts raw OHLCV data into a numeric MarketSnapshot (continuous features).
-
-Uses RAG over Al Brooks’ Trading Price Action books to retrieve relevant rules/examples.
-
-Injects a “global doctrine” (xinfa) as a stable decision framework.
-
-Produces a strict JSON decision output: whether to trade, and if yes, with entry / stop / targets / sizing, plus citations to sources.
+- Converts raw OHLCV into numeric `MarketSnapshot` features
+- Uses RAG over Brooks book chunks to retrieve relevant rules/examples
+- Injects a stable doctrine layer (`xinfa`) for consistency
+- Produces strict JSON decision output with citations
 
 Key idea:
 
-Python is the “eyes” (hard evidence: continuous features + price levels).
+- Python is the **eyes**: hard evidence (features, levels, candidate prices)
+- RAG is the **playbook**: grounded domain knowledge retrieval
+- LLM (optional) is the **analyst**: structured reasoning and explanation
 
-RAG provides the “playbook” (book knowledge retrieval).
+## Why This Is Portfolio-Relevant
 
-The LLM (optional) is the “analyst” (reasoning + structured plan + explanation).
+Even if it does not produce robust trading returns, it demonstrates practical engineering capabilities:
 
-Why it’s interesting (portfolio angle)
+- Feature engineering pipeline with explicit schema and reproducible inputs
+- Long-document RAG pipeline (PDF cleaning -> chunking -> metadata -> embedding -> retrieval)
+- Decision orchestration (routing, query planning, token budgeting, citation grounding)
+- Strict structured output design for evaluation and automation-readiness
+- Realistic handling of uncertainty, ambiguity, and risk constraints
 
-Even if this cannot reliably make money, it demonstrates real-world skills hiring teams care about:
+## High-Level Workflow
 
-Building a feature engineering pipeline with reproducible schemas and testability.
-
-Designing a RAG system for long-form PDFs (cleaning → chunking → metadata → embeddings → retrieval).
-
-Implementing a decision orchestration layer (routing, retrieval planning, token budgeting, citation tracking).
-
-Creating structured outputs suitable for evaluation and future automation.
-
-Thinking realistically about failure modes, uncertainty, ambiguity, and risk constraints.
-
-High-level architecture
+```text
 Raw OHLCV (CSV/API)
    ↓
 Feature Engineering (MarketSnapshot)
    ↓
-DecisionRequest (adds pricing levels + sizing candidates)
+DecisionRequest (levels + candidates + sizing)
    ↓
-RAG Retrieval (books + metadata filters + neighbor expansion)
+RAG Retrieval (book routing + metadata filters + neighbors)
    ↓
 Static Xinfa Injection (core + regime reinforcement)
    ↓
-(Optionally) LLM Decision Engine
+(Optional) LLM Decision Engine
    ↓
-Decision JSON (entry/SL/TP/size + citations)
-Core modules
-1) Feature Engineering (ai_brooks_features/)
+Decision JSON (action + entry/SL/TP/size + citations)
+```
 
-Produces MarketSnapshot (a compact numeric summary of the last bar + local context):
+## Module Breakdown
 
-bar anatomy (body/tails/close position)
+### 1) Feature Engineering (`ai_brooks_features/`)
 
-local trend state (EMA slope, micro-channel, pullback depth)
+Produces `MarketSnapshot` as a compact continuous representation of market state:
 
-swing structure (double top/bottom, wedge)
+- Bar anatomy: body/tails/close position
+- Local trend: EMA slope, micro-channel, pullback depth
+- Swing structure: double top/bottom, wedge-related signals
+- Range structure: overlap, tests, breakout-failure behavior
+- Reversal signals: climax and H1/H2/L1/L2 style scores
+- Regime scores: trend vs range vs reversal setup
 
-range structure (overlap, tests, breakout failure)
+Design choice: prefer mostly continuous scores (0-1) over brittle booleans.
 
-reversal signals (climax, final flag, High/Low 1/2 scores)
+Primary entrypoint:
 
-regime scores (trend vs range vs reversal setup)
+- `ai_brooks_features/builder.py`
 
-Design choice: features are mostly continuous scores (0–1) rather than fragile “pattern = True/False”.
+### 2) Xinfa Doctrine Layer (`ai_brooks_knowledge/xinfa_core/`)
 
-2) Knowledge distillation (“Xinfa”) (ai_brooks_knowledge/xinfa_core/)
+Large book knowledge is distilled into stable doctrine documents:
 
-The three Brooks books are large and repetitive. Instead of relying only on raw retrieval, the project distills a set of stable “doctrine documents” (xinfa), split into modules:
+- A: Worldview & Risk
+- B: Trend
+- C: Trading Range
+- D: Reversal
+- E: Psychology & Routines
+- F: Feature Glossary
 
-A: Worldview & Risk (core principles)
+Usage pattern:
 
-B: Trend
+- Always inject A + E + F
+- Add B/C/D based on detected regime
 
-C: Trading Range
+This improves consistency and reduces context drift.
 
-D: Reversal
+### 3) Knowledge Ingestion + Vectorization (`ai_brooks_knowledge/` + `scripts/build_vector_db.py`)
 
-E: Psychology & Routines
+Pipeline:
 
-F: Feature Glossary
+1. Extract text from PDFs
+2. Clean/de-noise (headers, footers, index/TOC artifacts, wrapped lines)
+3. Chunk and attach metadata (`book`, `part/chapter`, `pages`, `chunk_id`, `seq`)
+4. Embed and store in Chroma
 
-Usage:
+Key files:
 
-Always inject A + E + F as stable constraints.
+- `ai_brooks_knowledge/ingest_pipeline.py`
+- `ai_brooks_knowledge/ingest_books.py`
+- `scripts/build_vector_db.py`
 
-Inject B/C/D depending on the detected regime.
+### 4) RAG Orchestration (`ai_brooks_rag/`)
 
-This prevents the agent from “forgetting” core principles and improves consistency.
+- `router.py`: regime-aware retrieval planning
+- `rewrite.py`: multi-intent query generation (`pattern`, `regime`, `management`)
+- `decision_mapper.py`: decision request -> retrieval plan adapter
+- `retriever.py`: retrieval + dedup + neighbor expansion + token clipping
+- `context_builder.py`: builds final model messages and output schema instructions
+- `llm_client.py`: optional model call and strict JSON parse
 
-3) RAG pipeline (ai_brooks_knowledge/ + vector DB)
+### 5) Decision Layer (`decision_types.py`)
 
-Steps:
+Builds `DecisionRequest` with execution-relevant fields:
 
-Extract text from PDFs
+- `snapshot`: features from `MarketSnapshot`
+- `account`: risk constraints (per-trade / daily)
+- `position`: current position status
+- `instrument`: tick size / point value / quantity unit
+- `recent_bars`: local bar window for concrete pricing
+- `levels`: prior day levels, opening range, EMA/VWAP, swing anchors
+- `order_candidates`: Python-generated entry/SL/TP candidates
+- `sizing`: risk budget -> suggested quantity
 
-Clean and de-noise (headers/footers, TOC/index pages, broken lines)
+Important design: price levels and order candidates are computed in Python to reduce hallucination risk.
 
-Chunk with metadata (book, chapter/part, pages, sequence id)
+## Retrieval Strategy (RAG-Focused)
 
-Embed and store in Chroma
+This project directly addresses common RAG failure modes:
 
-Retrieve using:
+- Ambiguity (trend/range/reversal overlap):
+  - Regime-based routing
+  - Multi-book retrieval when uncertainty is high
+- Chunk fragmentation:
+  - Neighbor expansion via stable per-book `seq`
+- Over-retrieval:
+  - Token budgeting and final-K caps
+- Relevance drift:
+  - Mandatory citation-oriented output format
 
-regime routing (TREND / RANGE / REVERSAL)
+## Typical Output (When LLM Decision Is Enabled)
 
-multiple query intents (pattern / regime / management)
+Strict JSON fields include:
 
-neighbor expansion (seq ± N) to restore lost context
+- `action`: `WAIT | ENTER_LONG | ENTER_SHORT | MANAGE | EXIT`
+- `entry`: type + price + trigger
+- `stop_loss`: price + reason
+- `take_profit`: one or more targets with size fractions
+- `position_size`: quantity + cash risk + risk-R
+- `reasons`, `trigger_conditions`, `invalidation_conditions`, `next_bar_plan`
+- `citations`: grounded references
 
-token budgeting to keep context usable
+Citation format:
 
-4) Decision layer (decision_types.py + ai_brooks_rag/)
+- Book chunks: `[[BOOK:BOOK|pSTART-END|CHUNK_ID|seq=S]]`
+- Xinfa docs: `[[XINFA:FILENAME.md]]`
 
-The system builds a DecisionRequest that includes:
+## What Is Out of Scope (Current Stage)
 
-MarketSnapshot
+- Not a production trading system
+- No profitability claim
+- No broker execution integration
+- No complete walk-forward framework with full cost/slippage modeling
+- No guarantee that pattern logic generalizes across regimes/instruments
 
-account constraints (max risk per trade/day)
+## Quick Start Workflow
 
-position state (if already in a trade)
+### 0) Setup
 
-instrument spec (tick size, point value)
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+pip install langchain-chroma pymupdf tiktoken
+```
 
-recent bars window (for exact price references)
+Create `.env`:
 
-key price levels (yesterday high/low, opening range, EMA/VWAP, swing points)
+```dotenv
+OPENAI_API_KEY=your_api_key
+```
 
-order candidates (Python-generated candidate entry/SL/TP levels)
+### 1) Build / Refresh Chroma Vector DB
 
-sizing advice (risk budget → suggested quantity)
+```powershell
+python scripts\build_vector_db.py --reset
+python scripts\test_search.py
+```
 
-Important: price levels and order candidates are computed in Python to reduce hallucinations.
-The LLM (when used) is expected to choose among candidates and justify with citations.
+### 2) Inspect DecisionRequest (Pricing Inputs + Candidates)
 
-Retrieval strategy (RAG focus)
+```powershell
+python scripts\test_decision_request_fields.py --index 4570 --save
+```
 
-This project explicitly targets common RAG failure modes:
+### 3) Inspect Context Sent to LLM (No LLM Call)
 
-Ambiguity: trend vs range vs reversal setups overlap frequently.
+```powershell
+python scripts\inspect_decision_context.py --dr data\tmp\dr_4570.json --save-messages
+```
 
-Solution: regime-based routing + multi-book retrieval when uncertain.
+### 4) Optional Full Decision Run (LLM Enabled)
 
-Chunk fragmentation: important explanations often span adjacent chunks.
+```powershell
+python scripts\run_decision.py --dr data\tmp\dr_4570.json --model gpt-5
+```
 
-Solution: neighbor expansion using a stable seq per book.
+## Tech Stack
 
-Over-retrieval: too many chunks reduces model focus.
+### Core Language and Data
 
-Solution: token budgets + final-k caps + optional compression layer.
+- Python
+- pandas, numpy
 
-Relevance drift: a “pretty” answer is useless if not grounded.
+### Market Feature Engineering
 
-Solution: mandatory citations for rules used in decisions.
+- Custom indicators and engineered schema (`MarketSnapshot`)
 
-What it outputs (when decision engine is enabled)
+### Document and Knowledge Pipeline
 
-A strict JSON object such as:
+- PyMuPDF (`fitz`) for PDF extraction
+- Custom text cleaning, structure parsing, chunking, metadata tracking
 
-action: WAIT / ENTER_LONG / ENTER_SHORT / MANAGE / EXIT
+### Retrieval and Vector Store
 
-entry: order type + price + trigger condition
+- Chroma (local persistence)
+- LangChain wrappers (`langchain-chroma`, `langchain-openai`, `langchain-core`, `langchain-community`)
 
-stop_loss: price + reason
+### Embeddings and Optional LLM
 
-take_profit: one or more targets + size fractions + reasons
+- OpenAI embeddings (`text-embedding-3-small`)
+- Optional OpenAI model inference for decision JSON output
 
-position_size: quantity + cash risk + R risk
+### Orchestration
 
-reasons: concise bullets
+- Custom router/retriever with metadata filters, neighbor expansion, and token budgeting
 
-invalidation_conditions: when the setup fails
+## Failure Modes and Realism
 
-citations: list of [[BOOK:...]] and [[XINFA:...]]
+This project is expected to fail as a money-printing bot for structural reasons:
 
-What’s intentionally out of scope (for now)
+- Price action interpretation is subjective
+- Regime ambiguity is frequent
+- Slippage/fees/latency dominate intraday edges
+- Pattern detector overfitting risk is high
+- LLMs can appear confident when uncertain
 
-This is not a production trading system.
+Therefore the focus is a reproducible, inspectable research pipeline rather than return promises.
 
-No claim of profitability.
+## Roadmap (Portfolio-Friendly)
 
-No robust walk-forward optimization, full evaluation harness, or transaction cost modeling yet.
+- Retrieval evaluation harness (chapter/topic hit quality)
+- Decision consistency checks (schema compliance + citation coverage)
+- Paper-trading simulator with slippage/fees
+- Optional reranking for ambiguous regimes
+- Better magnet/measured-move target logic
+- Lightweight UI for timeline + citations review
 
-No broker execution integration.
+## Repository Snapshot
 
-No guarantees about pattern correctness or market generalization.
+```text
+brooks_agent/
+  ai_brooks_features/
+  ai_brooks_knowledge/
+  ai_brooks_rag/
+  ai_brooks_decision/
+  scripts/
+  decision_types.py
+  data_loader.py
+  data/
+```
 
-How to run (typical workflow)
-1) Build vector DB (books → chunks → embeddings → Chroma)
-python scripts/build_vector_db.py --reset
-python scripts/test_search.py
-2) Inspect DecisionRequest (pricing inputs / candidates)
-python -m scripts.test_decision_request_fields --index 4570 --save
-3) Inspect what would be sent to the LLM (no LLM calls)
-python -m scripts.inspect_decision_context --dr data/tmp/dr_XXXX.json --save-messages
-4) (Optional) Run the full decision pipeline (LLM enabled)
+---
 
-This step is optional and may not be enabled by default in the repo.
-
-Failure modes & realism
-
-This project is expected to fail as a money-printing bot for multiple reasons:
-
-Price action is subjective; translating it into features loses information.
-
-Regime ambiguity is common; “right answer” is often probabilistic.
-
-Slippage/fees/latency matter, especially for intraday.
-
-Overfitting risk is high when designing pattern detectors.
-
-LLMs can sound confident even when uncertain.
-
-Therefore: the focus is on the engineering + research process and building a reproducible, inspectable pipeline.
-
-Tech stack (high level)
-
-Python (pandas, numpy)
-
-Feature pipeline (custom indicators + engineered schema)
-
-PDF processing + cleaning + chunking
-
-Vector DB: Chroma (local persistence)
-
-Embeddings: OpenAI embeddings (configurable)
-
-RAG orchestration: custom router/retriever + metadata filters
-
-Optional LLM decision engine: OpenAI API (configurable)
-
-Roadmap (portfolio-friendly)
-
-Add evaluation harness:
-
-retrieval quality metrics (hit rate by chapter/topic)
-
-decision consistency checks (schema validation, citation coverage)
-
-paper-trading simulator with slippage/fees
-
-Add optional reranking layer for ambiguous regimes
-
-Add better “magnet” detection and measured-move targets
-
-Add UI for reviewing decisions (timeline + citations)
+If you are evaluating this project as a portfolio artifact, prioritize the architecture, interfaces, testability, and failure analysis over short-term trading performance.
