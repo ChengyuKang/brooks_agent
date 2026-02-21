@@ -1,9 +1,9 @@
-# AI Brooks RAG Trading Agent (Research / Portfolio Project)
+# AI Brooks RAG Trading Agent (Practice Project)
 
-**Status:** Research prototype / portfolio project  
+**Status:** Research prototype project  
 **Goal:** Explore how to combine feature engineering + RAG + LLM reasoning to produce a structured, explainable trading plan inspired by Al Brooks' price-action framework.
 
-> This project is **not** a proven profitable system and is expected to fail as a fully automated strategy in real markets.  
+> This project is **not** a failed system and is expected to fail as a fully automated strategy in real markets.  
 > The focus is engineering and research process, not guaranteed returns.
 
 ## What This Project Is
@@ -32,6 +32,7 @@ Even if it does not produce robust trading returns, it demonstrates practical en
 - Realistic handling of uncertainty, ambiguity, and risk constraints
 
 ## High-Level Workflow
+<img width="3052" height="5800" alt="image" src="https://github.com/user-attachments/assets/c27bbe8d-925e-4d62-b14b-687fdc15571d" />
 
 ```text
 Raw OHLCV (CSV/API)
