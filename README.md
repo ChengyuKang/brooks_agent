@@ -3,7 +3,7 @@
 **Status:** Research prototype project  
 **Goal:** Explore how to combine feature engineering + RAG + LLM reasoning to produce a structured, explainable trading plan inspired by Al Brooks' price-action framework.
 
-> This project is **not** a failed system and is expected to fail as a fully automated strategy in real markets.  
+> This project is **not** a profitable system and is expected to fail as a fully automated strategy in real markets.  
 > The focus is engineering and research process, not guaranteed returns.
 
 ## What This Project Is
@@ -11,6 +11,7 @@
 This repository builds a modular AI trading assistant prototype for intraday workflows (currently focused on 5-minute bars for SPY/ES-style instruments). It:
 
 - Converts raw OHLCV into numeric `MarketSnapshot` features
+- Use regime routing to select which book(s)/retrieval strategy to use based on the current market regime (trend vs range vs reversal)
 - Uses RAG over Brooks book chunks to retrieve relevant rules/examples
 - Injects a stable doctrine layer (`xinfa`) for consistency
 - Produces strict JSON decision output with citations
